@@ -94,8 +94,8 @@ export default function LogGameModal({ game, onClose, onSuccess }: Props) {
   if (!game) return null
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-2xl w-full max-w-lg p-6">
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
+      <div className="w-full max-w-lg p-6 rounded-2xl shadow-xl" style={{ background: 'var(--surface)' }}>
         <div className="flex items-start gap-4 mb-6">
           {game.cover && (
             <Image
@@ -107,9 +107,9 @@ export default function LogGameModal({ game, onClose, onSuccess }: Props) {
             />
           )}
           <div>
-            <h2 className="text-xl font-bold text-white">{game.name}</h2>
+            <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>{game.name}</h2>
             {game.first_release_date && (
-              <p className="text-gray-400 text-sm">
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                 {new Date(game.first_release_date * 1000).getFullYear()}
               </p>
             )}
@@ -117,21 +117,20 @@ export default function LogGameModal({ game, onClose, onSuccess }: Props) {
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+          <div className="mb-4 p-3 rounded-lg text-sm" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)' }}>
             {error}
           </div>
         )}
 
         <div className="mb-6">
-          <label className="block text-sm text-gray-400 mb-2">Rating</label>
+          <label className="block text-sm mb-2" style={{ color: 'var(--text-muted)' }}>Rating</label>
           <div className="flex gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 onClick={() => setRating(star)}
-                className={`text-3xl transition-colors ${
-                  star <= rating ? 'text-yellow-400' : 'text-gray-600'
-                } hover:text-yellow-400`}
+                className="text-3xl transition-colors"
+                style={{ color: star <= rating ? '#facc15' : 'var(--border)' }}
               >
                 ★
               </button>
@@ -140,17 +139,17 @@ export default function LogGameModal({ game, onClose, onSuccess }: Props) {
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm text-gray-400 mb-2">Tags</label>
+          <label className="block text-sm mb-2" style={{ color: 'var(--text-muted)' }}>Tags</label>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
               <button
                 key={tag.id}
                 onClick={() => toggleTag(tag.id)}
-                className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                  selectedTags.includes(tag.id)
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                }`}
+                className="px-3 py-1 rounded-full text-sm transition-opacity hover:opacity-80"
+                style={{
+                  background: selectedTags.includes(tag.id) ? 'var(--accent)' : 'var(--surface-2)',
+                  color: selectedTags.includes(tag.id) ? '#fff' : 'var(--text-muted)',
+                }}
               >
                 {tag.name}
               </button>
@@ -159,27 +158,36 @@ export default function LogGameModal({ game, onClose, onSuccess }: Props) {
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm text-gray-400 mb-2">Review <span className="text-gray-600">(optional)</span></label>
+          <label className="block text-sm mb-2" style={{ color: 'var(--text-muted)' }}>
+            Review <span style={{ color: 'var(--border)' }}>(optional)</span>
+          </label>
           <textarea
             value={review}
             onChange={(e) => setReview(e.target.value)}
             placeholder="What did you think?"
             rows={3}
-            className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 resize-none"
+            className="w-full px-4 py-2.5 rounded-lg border focus:outline-none resize-none"
+            style={{
+              background: 'var(--surface-2)',
+              borderColor: 'var(--border)',
+              color: 'var(--foreground)',
+            }}
           />
         </div>
 
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
+            className="flex-1 py-2.5 rounded-lg transition-opacity hover:opacity-80"
+            style={{ background: 'var(--surface-2)', color: 'var(--foreground)' }}
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={loading || rating === 0}
-            className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-medium rounded-lg transition-colors"
+            className="flex-1 py-2.5 rounded-lg font-medium transition-opacity hover:opacity-90 disabled:opacity-50"
+            style={{ background: 'var(--accent)', color: '#fff' }}
           >
             {loading ? 'Saving...' : 'Log Game'}
           </button>

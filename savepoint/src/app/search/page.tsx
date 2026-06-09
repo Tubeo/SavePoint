@@ -33,7 +33,7 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-8">
+    <div className="min-h-screen p-8" style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Search Games</h1>
 
@@ -44,12 +44,18 @@ export default function SearchPage() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="Search for a game..."
-            className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+            className="flex-1 px-4 py-2.5 rounded-lg border focus:outline-none"
+            style={{
+              background: 'var(--surface)',
+              borderColor: 'var(--border)',
+              color: 'var(--foreground)',
+            }}
           />
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 rounded-lg font-medium transition-colors"
+            className="px-6 py-2.5 rounded-lg font-medium transition-opacity hover:opacity-90 disabled:opacity-50"
+            style={{ background: 'var(--accent)', color: '#fff' }}
           >
             {loading ? 'Searching...' : 'Search'}
           </button>
@@ -60,7 +66,8 @@ export default function SearchPage() {
             <div
               key={game.id}
               onClick={() => setSelectedGame(game)}
-              className="flex gap-4 p-4 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors cursor-pointer"
+              className="flex gap-4 p-4 rounded-xl cursor-pointer transition-opacity hover:opacity-80"
+              style={{ background: 'var(--surface)' }}
             >
               {game.cover ? (
                 <Image
@@ -71,19 +78,22 @@ export default function SearchPage() {
                   className="rounded-lg object-cover"
                 />
               ) : (
-                <div className="w-[60px] h-[80px] bg-gray-700 rounded-lg flex items-center justify-center text-gray-500 text-xs">
+                <div className="w-[60px] h-[80px] rounded-lg flex items-center justify-center text-xs"
+                  style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}>
                   No art
                 </div>
               )}
               <div className="flex-1">
                 <h2 className="font-semibold text-lg">{game.name}</h2>
                 {game.first_release_date && (
-                  <p className="text-gray-400 text-sm mb-1">
+                  <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>
                     {new Date(game.first_release_date * 1000).getFullYear()}
                   </p>
                 )}
                 {game.summary && (
-                  <p className="text-gray-500 text-sm line-clamp-2">{game.summary}</p>
+                  <p className="text-sm line-clamp-2" style={{ color: 'var(--text-muted)' }}>
+                    {game.summary}
+                  </p>
                 )}
               </div>
             </div>
