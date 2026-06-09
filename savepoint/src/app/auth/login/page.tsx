@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import MarqueeBackground from '@/components/MarqueeBackground'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -20,7 +21,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      setError(error.message)
+      setError('Invalid email or password. Please try again.')
       setLoading(false)
       return
     }
@@ -30,55 +31,60 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950">
-      <div className="w-full max-w-md p-8 bg-gray-900 rounded-2xl shadow-xl">
-        <h1 className="text-2xl font-bold text-white mb-6">Welcome back</h1>
+    <MarqueeBackground>
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <div className="w-full max-w-md p-8 rounded-2xl shadow-xl" style={{ background: 'var(--surface)' }}>
+          <h1 className="text-2xl font-bold mb-6" style={{ color: 'var(--foreground)' }}>Welcome back</h1>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-            {error}
+          {error && (
+            <div className="mb-4 p-3 rounded-lg text-sm" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)' }}>
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm mb-1" style={{ color: 'var(--text-muted)' }}>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg border focus:outline-none"
+                style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                placeholder="you@example.com"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm mb-1" style={{ color: 'var(--text-muted)' }}>Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg border focus:outline-none"
+                style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button
+              onClick={handleLogin}
+              disabled={loading}
+              className="w-full py-2.5 rounded-lg font-medium transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{ background: 'var(--accent)', color: '#fff' }}
+            >
+              {loading ? 'Signing in...' : 'Sign in'}
+            </button>
           </div>
-        )}
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
-              placeholder="you@example.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button
-            onClick={handleLogin}
-            disabled={loading}
-            className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-medium rounded-lg transition-colors"
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
+          <p className="mt-6 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+            Don't have an account?{' '}
+            <Link href="/auth/signup" style={{ color: 'var(--accent)' }} className="hover:opacity-80">
+              Sign up
+            </Link>
+          </p>
         </div>
-
-        <p className="mt-6 text-center text-gray-400 text-sm">
-          Don't have an account?{' '}
-          <Link href="/auth/signup" className="text-indigo-400 hover:text-indigo-300">
-            Sign up
-          </Link>
-        </p>
       </div>
-    </div>
+    </MarqueeBackground>
   )
 }

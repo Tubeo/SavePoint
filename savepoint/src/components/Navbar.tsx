@@ -3,61 +3,104 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 
 export default function Navbar() {
   const router = useRouter()
   const supabase = createClient()
   const { theme, setTheme } = useTheme()
+  const [username, setUsername] = useState<string | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', user.id)
+          .single()
+          .then(({ data }) => setUsername(data?.username ?? null))
+      } else {
+        setUsername(null)
+      }
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', session.user.id)
+          .single()
+          .then(({ data }) => setUsername(data?.username ?? null))
+      } else {
+        setUsername(null)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
-    router.push('/auth/login')
+    router.push('/')
     router.refresh()
   }
 
-  const themes = [
-    { id: 'dark', label: '🌙' },
-    { id: 'light', label: '☀️' },
-    { id: 'oled', label: '⚫' },
-  ]
-
   return (
-    <nav className="border-b px-8 py-4" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+    <nav className="border-b px-8 py-4 sticky top-0 z-50" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
       <div className="max-w-5xl mx-auto flex items-center justify-between">
         <Link href="/" className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>
           Savepoint
         </Link>
 
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: 'var(--surface-2)' }}>
-            {themes.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setTheme(t.id)}
-                className={`px-2 py-1 rounded-md text-sm transition-colors ${
-                  theme === t.id ? 'bg-white/10' : 'hover:bg-white/5'
-                }`}
-                title={t.id}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-
-          <Link href="/search" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
-            Search
-          </Link>
-          <Link href="/profile" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
-            Profile
-          </Link>
-          <button
-            onClick={handleSignOut}
-            style={{ color: 'var(--text-muted)' }}
-            className="hover:opacity-80 transition-opacity"
+          <select
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
+            className="px-3 py-1.5 rounded-lg border text-sm focus:outline-none cursor-pointer"
+            style={{
+              background: 'var(--surface-2)',
+              borderColor: 'var(--border)',
+              color: 'var(--foreground)',
+            }}
           >
-            Sign out
-          </button>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="oled">OLED</option>
+          </select>
+
+          {username ? (
+            <>
+              <Link href="/search" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
+                Search
+              </Link>
+              <Link href="/profile" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
+                {username}
+              </Link>
+              <button
+                onClick={handleSignOut}
+                style={{ color: 'var(--text-muted)' }}
+                className="hover:opacity-80 transition-opacity"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
+                Sign in
+              </Link>
+              <Link
+                href="/auth/signup"
+                className="px-4 py-1.5 rounded-lg text-sm font-medium transition-opacity hover:opacity-90"
+                style={{ background: 'var(--accent)', color: '#fff' }}
+              >
+                Get started
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
