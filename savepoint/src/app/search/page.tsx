@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import LogGameModal from '@/components/LogGameModal'
 
 interface Game {
   id: number
@@ -11,10 +12,15 @@ interface Game {
   summary?: string
 }
 
+const getCoverUrl = (url: string) => {
+  return 'https:' + url.replace('t_thumb', 't_cover_big')
+}
+
 export default function SearchPage() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Game[]>([])
   const [loading, setLoading] = useState(false)
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null)
 
   const handleSearch = async () => {
     if (!query.trim()) return
@@ -25,10 +31,6 @@ export default function SearchPage() {
     setResults(data)
     setLoading(false)
   }
-
-  const getCoverUrl = (url: string) => {
-  return 'https:' + url.replace('t_thumb', 't_cover_big')
-    }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-8">
@@ -55,7 +57,11 @@ export default function SearchPage() {
 
         <div className="space-y-4">
           {results.map((game) => (
-            <div key={game.id} className="flex gap-4 p-4 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors cursor-pointer">
+            <div
+              key={game.id}
+              onClick={() => setSelectedGame(game)}
+              className="flex gap-4 p-4 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors cursor-pointer"
+            >
               {game.cover ? (
                 <Image
                   src={getCoverUrl(game.cover.url)}
@@ -84,6 +90,12 @@ export default function SearchPage() {
           ))}
         </div>
       </div>
+
+      <LogGameModal
+        game={selectedGame}
+        onClose={() => setSelectedGame(null)}
+        onSuccess={() => console.log('Game logged!')}
+      />
     </div>
   )
 }
