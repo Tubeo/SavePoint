@@ -74,6 +74,9 @@ export default function Navbar() {
 
           {username ? (
             <>
+              <Link href="/browse" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
+               Browse Games
+              </Link>
               <Link href="/search" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
                 Search
               </Link>
@@ -93,6 +96,9 @@ export default function Navbar() {
             </>
           ) : (
             <>
+              <Link href="/browse" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
+                Browse
+              </Link>
               <Link href="/auth/login" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
                 Sign in
               </Link>
