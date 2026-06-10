@@ -68,8 +68,7 @@ export default function MarqueeBackground({ children }: { children: React.ReactN
 
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, var(--background) 0%, transparent 20%, transparent 80%, var(--background) 100%)'
-      }} />
+        background: 'linear-gradient(to bottom, var(--background) 0%, transparent 20%, transparent 80%, var(--background) 100%)'      }} />
 
       <div style={{ position: 'relative', zIndex: 2 }}>
         {children}

@@ -49,12 +49,17 @@ export default function Navbar() {
     router.refresh()
   }
 
+  const nav = (href: string) => {
+    router.push(href)
+    router.refresh()
+  }
+
   return (
     <nav className="border-b px-8 py-4 sticky top-0 z-50" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
       <div className="max-w-5xl mx-auto flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>
+        <button onClick={() => nav('/')} className="text-xl font-bold cursor-pointer" style={{ color: 'var(--foreground)' }}>
           Savepoint
-        </Link>
+        </button>
 
         <div className="flex items-center gap-6">
           <select
@@ -74,18 +79,18 @@ export default function Navbar() {
 
           {username ? (
             <>
-              <Link href="/browse" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
-               Browse Games
-              </Link>
-              <Link href="/search" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
+              <button onClick={() => nav('/browse')} style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity cursor-pointer">
+                Game Catalogue
+              </button>
+              <button onClick={() => nav('/search')} style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity cursor-pointer">
                 Search
-              </Link>
-              <Link href="/reviews" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
+              </button>
+              <button onClick={() => nav('/reviews')} style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity cursor-pointer">
                 My Reviews
-              </Link>
-              <Link href="/profile" style={{ color: 'var(--foreground)', fontWeight: 500 }} className="hover:opacity-80 transition-opacity">
+              </button>
+              <button onClick={() => nav('/profile')} style={{ color: 'var(--foreground)', fontWeight: 500 }} className="hover:opacity-80 transition-opacity cursor-pointer">
                 {username}
-              </Link>
+              </button>
               <button
                 onClick={handleSignOut}
                 style={{ color: 'var(--text-muted)' }}
@@ -96,12 +101,12 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/browse" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
-                Browse
-              </Link>
-              <Link href="/auth/login" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
+              <button onClick={() => nav('/browse')} style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity cursor-pointer">
+                Game Catalogue
+              </button>
+              <button onClick={() => nav('/auth/login')} style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity cursor-pointer">
                 Sign in
-              </Link>
+              </button>
               <Link
                 href="/auth/signup"
                 className="px-4 py-1.5 rounded-lg text-sm font-medium transition-opacity hover:opacity-90"
