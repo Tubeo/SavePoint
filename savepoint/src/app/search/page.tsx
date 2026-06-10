@@ -27,7 +27,6 @@ export default function SearchPage() {
   const handleSearch = async () => {
     if (!query.trim()) return
     setLoading(true)
-
     const res = await fetch(`/api/games/search?q=${encodeURIComponent(query)}`)
     const data = await res.json()
     setResults(data)
@@ -36,11 +35,18 @@ export default function SearchPage() {
 
   return (
     <MarqueeBackground>
-      <div className="p-8" style={{ color: 'var(--foreground)' }}>
-        <div className="max-w-3xl mx-auto">
+      <div className="p-8 min-h-screen">
+        <div
+          className="max-w-3xl mx-auto rounded-2xl p-8"
+          style={{
+            background: 'color-mix(in srgb, var(--background) 92%, transparent)',
+            border: '1px solid var(--border)',
+            color: 'var(--foreground)',
+          }}
+        >
           <h1 className="text-3xl font-bold mb-8">Search Games</h1>
 
-          <div className="flex gap-3 mb-8">
+          <div className="flex gap-3 mb-6">
             <input
               type="text"
               value={query}
@@ -64,51 +70,71 @@ export default function SearchPage() {
             </button>
           </div>
 
-          <div className="space-y-4">
-            {results.map((game) => (
-              <div
-                key={game.id}
-                onClick={() => setSelectedGame(game)}
-                className="flex gap-4 p-4 rounded-xl cursor-pointer transition-opacity hover:opacity-80"
-                style={{ background: 'var(--surface)' }}
-              >
-                {game.cover ? (
-                  <Image
-                    src={getCoverUrl(game.cover.url)}
-                    alt={game.name}
-                    width={60}
-                    height={80}
-                    className="rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="w-[60px] h-[80px] rounded-lg flex items-center justify-center text-xs"
-                    style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}>
-                    No art
+          {results.length > 0 && (
+            <div
+              style={{
+                maxHeight: '480px',
+                overflowY: 'auto',
+                borderRadius: '12px',
+                border: '1px solid var(--border)',
+              }}
+            >
+              {results.map((game, index) => (
+                <div
+                  key={game.id}
+                  onClick={() => setSelectedGame(game)}
+                  className="flex gap-4 p-4 cursor-pointer transition-opacity hover:opacity-80"
+                  style={{
+                    background: 'var(--surface)',
+                    borderBottom: index < results.length - 1 ? '1px solid var(--border)' : 'none',
+                  }}
+                >
+                  {game.cover ? (
+                    <Image
+                      src={getCoverUrl(game.cover.url)}
+                      alt={game.name}
+                      width={50}
+                      height={67}
+                      className="rounded-lg object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div
+                      className="rounded-lg flex items-center justify-center text-xs flex-shrink-0"
+                      style={{ width: 50, height: 67, background: 'var(--surface-2)', color: 'var(--text-muted)' }}
+                    >
+                      No art
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h2 className="font-semibold text-base">{game.name}</h2>
+                    {game.first_release_date && (
+                      <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>
+                        {new Date(game.first_release_date * 1000).getFullYear()}
+                      </p>
+                    )}
+                    {game.summary && (
+                      <p className="text-sm line-clamp-2" style={{ color: 'var(--text-muted)' }}>
+                        {game.summary}
+                      </p>
+                    )}
                   </div>
-                )}
-                <div className="flex-1">
-                  <h2 className="font-semibold text-lg">{game.name}</h2>
-                  {game.first_release_date && (
-                    <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>
-                      {new Date(game.first_release_date * 1000).getFullYear()}
-                    </p>
-                  )}
-                  {game.summary && (
-                    <p className="text-sm line-clamp-2" style={{ color: 'var(--text-muted)' }}>
-                      {game.summary}
-                    </p>
-                  )}
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
+
+          {results.length === 0 && !loading && query && (
+            <p className="text-sm text-center py-8" style={{ color: 'var(--text-muted)' }}>
+              No results found for &quot;{query}&quot;
+            </p>
+          )}
         </div>
       </div>
 
       <LogGameModal
         game={selectedGame}
         onClose={() => setSelectedGame(null)}
-        onSuccess={() => console.log('Game logged!')}
+        onSuccess={() => setSelectedGame(null)}
       />
     </MarqueeBackground>
   )
