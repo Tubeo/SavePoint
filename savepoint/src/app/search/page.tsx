@@ -12,6 +12,7 @@ interface Game {
   cover?: { url: string }
   first_release_date?: number
   summary?: string
+  rating_count?: number
 }
 
 const getCoverUrl = (url: string) => {
@@ -42,7 +43,8 @@ export default function SearchPage() {
     debounceRef.current = setTimeout(async () => {
       const res = await fetch(`/api/games/search?q=${encodeURIComponent(query)}`)
       const data = await res.json()
-      setSuggestions(data.slice(0, 15))
+      const sorted = [...data].sort((a, b) => (b.rating_count ?? 0) - (a.rating_count ?? 0))
+      setSuggestions(sorted.slice(0, 15))
       setShowSuggestions(true)
     }, 150)
 
@@ -72,7 +74,7 @@ export default function SearchPage() {
     setHasSearched(true)
     const res = await fetch(`/api/games/search?q=${encodeURIComponent(query)}`)
     const data = await res.json()
-    setResults(data)
+    setResults([...data].sort((a, b) => (b.rating_count ?? 0) - (a.rating_count ?? 0)))
     setLoading(false)
   }
 
