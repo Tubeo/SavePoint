@@ -43,6 +43,15 @@ export default function LogGameModal({ game, onClose, onSuccess }: Props) {
     fetchTags()
   }, [])
 
+  useEffect(() => {
+    if (game) {
+      setRating(0)
+      setReview('')
+      setSelectedTags([])
+      setError(null)
+    }
+  }, [game])
+
   const toggleTag = (tagId: number) => {
     setSelectedTags(prev =>
       prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
@@ -66,6 +75,7 @@ export default function LogGameModal({ game, onClose, onSuccess }: Props) {
       .insert({
         user_id: user.id,
         game_id: game.id.toString(),
+        game_slug: game.slug ?? null,
         game_title: game.name,
         game_cover: game.cover ? getCoverUrl(game.cover.url) : null,
         rating,

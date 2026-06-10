@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'text/plain',
       },
-      body: `search "${query}"; fields name,cover.url,first_release_date,summary; limit 10;`,
+      body: `search "${query}"; fields name,slug,cover.url,first_release_date,summary; limit 10;`,
     })
 
     const games = await res.json()

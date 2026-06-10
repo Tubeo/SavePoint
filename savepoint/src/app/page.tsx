@@ -24,7 +24,7 @@ function MarqueeRow({ games, reverse = false }: { games: Game[], reverse?: boole
         display: 'flex',
         gap: '10px',
         width: 'max-content',
-        animation: `${reverse ? 'scrollRight' : 'scrollLeft'} 40s linear infinite`,
+        animation: `${reverse ? 'scrollRight' : 'scrollLeft'} 55s linear infinite`,
       }}>
         {doubled.map((game, i) => (
           game.cover ? (
@@ -52,19 +52,27 @@ export default function HomePage() {
   useEffect(() => {
     fetch('/api/games/popular')
       .then(res => res.json())
-      .then(data => setGames(data))
+      .then(data => {
+        const shuffled = [...data].sort(() => Math.random() - 0.5)
+        setGames(shuffled)
+      })
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      if (user) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser(session.user)
         supabase
           .from('profiles')
           .select('username')
-          .eq('id', user.id)
+          .eq('id', session.user.id)
           .single()
           .then(({ data }) => setUsername(data?.username ?? null))
+      } else {
+        setUser(null)
+        setUsername(null)
       }
     })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   const row1 = games.slice(0, 20)

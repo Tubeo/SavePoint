@@ -8,6 +8,7 @@ import MarqueeBackground from '@/components/MarqueeBackground'
 interface Game {
   id: number
   name: string
+  slug?: string
   cover?: { url: string }
   first_release_date?: number
   summary?: string
