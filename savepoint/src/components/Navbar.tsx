@@ -44,6 +44,7 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
+    setUsername(null)
     router.push('/')
     router.refresh()
   }
@@ -76,7 +77,10 @@ export default function Navbar() {
               <Link href="/search" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
                 Search
               </Link>
-              <Link href="/profile" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
+              <Link href="/reviews" style={{ color: 'var(--text-muted)' }} className="hover:opacity-80 transition-opacity">
+                My Reviews
+              </Link>
+              <Link href="/profile" style={{ color: 'var(--foreground)', fontWeight: 500 }} className="hover:opacity-80 transition-opacity">
                 {username}
               </Link>
               <button

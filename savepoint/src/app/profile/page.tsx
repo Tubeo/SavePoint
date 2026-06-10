@@ -1,18 +1,7 @@
 import { redirect } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import MarqueeBackground from '@/components/MarqueeBackground'
-
-interface GameLog {
-  id: number
-  game_title: string
-  game_cover: string | null
-  game_slug: string | null
-  rating: number
-  review: string | null
-  created_at: string
-}
 
 export default async function ProfilePage() {
   const supabase = await createServerSupabaseClient()
@@ -29,17 +18,16 @@ export default async function ProfilePage() {
     .eq('id', user.id)
     .single()
 
-  const { data: logs } = await supabase
+  const { count } = await supabase
     .from('game_logs')
-    .select('*')
+    .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
 
   return (
     <MarqueeBackground>
       <div className="p-8 min-h-screen">
         <div
-          className="max-w-7xl mx-auto rounded-2xl p-8"
+          className="max-w-5xl mx-auto rounded-2xl p-8"
           style={{
             background: 'color-mix(in srgb, var(--background) 92%, transparent)',
             border: '1px solid var(--border)',
@@ -47,51 +35,57 @@ export default async function ProfilePage() {
           }}
         >
           <div className="mb-10">
-            <h1 className="text-3xl font-bold">{profile?.username}</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-              {logs?.length ?? 0} games logged
+            <p className="text-sm uppercase tracking-wider mb-2" style={{ color: 'var(--accent)' }}>
+              Welcome back
+            </p>
+            <h1 className="text-4xl font-bold">{profile?.username}</h1>
+            <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
+              {count ?? 0} games logged
             </p>
           </div>
 
-          <h2 className="text-xl font-semibold mb-4">Games</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {logs?.map((log: GameLog) => {
-              const cover = (
-                <div className="group relative cursor-pointer">
-                  {log.game_cover ? (
-                    <Image
-                      src={log.game_cover}
-                      alt={log.game_title}
-                      width={264}
-                      height={352}
-                      className="rounded-lg object-cover w-full aspect-[3/4]"
-                    />
-                  ) : (
-                    <div
-                      className="w-full aspect-[3/4] rounded-lg flex items-center justify-center text-xs text-center p-2"
-                      style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}
-                    >
-                      {log.game_title}
-                    </div>
-                  )}
-                  <div
-                    className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-2"
-                    style={{ background: 'rgba(0,0,0,0.75)' }}
-                  >
-                    <p className="text-2xl" style={{ color: '#facc15' }}>{'★'.repeat(log.rating)}</p>
-                    <p className="text-white text-sm text-center mt-1 line-clamp-2">{log.game_title}</p>
-                  </div>
-                </div>
-              )
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link
+              href="/reviews"
+              className="rounded-xl p-6 transition-opacity hover:opacity-90"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            >
+              <h2 className="text-lg font-semibold mb-1">My Reviews</h2>
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                See every game you&apos;ve logged and rated.
+              </p>
+            </Link>
 
-              return log.game_slug ? (
-                <Link key={log.id} href={`/game/${log.game_slug}`}>
-                  {cover}
-                </Link>
-              ) : (
-                <div key={log.id}>{cover}</div>
-              )
-            })}
+            <Link
+              href="/search"
+              className="rounded-xl p-6 transition-opacity hover:opacity-90"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            >
+              <h2 className="text-lg font-semibold mb-1">Log a Game</h2>
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                Search for a game and add it to your collection.
+              </p>
+            </Link>
+
+            <div
+              className="rounded-xl p-6"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', opacity: 0.6 }}
+            >
+              <h2 className="text-lg font-semibold mb-1">Your Top 4</h2>
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                Coming soon — showcase your favourite games.
+              </p>
+            </div>
+
+            <div
+              className="rounded-xl p-6"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', opacity: 0.6 }}
+            >
+              <h2 className="text-lg font-semibold mb-1">Your Stats</h2>
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                Coming soon — your gaming year at a glance.
+              </p>
+            </div>
           </div>
         </div>
       </div>
