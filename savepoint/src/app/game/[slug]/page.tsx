@@ -1,12 +1,14 @@
-import Image from 'next/image'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import MarqueeBackground from '@/components/MarqueeBackground'
+import GamePageClient from '@/components/GamePageClient'
 
 interface Genre { id: number; name: string }
 interface Platform { id: number; name: string }
-interface Company { company: { name: string } }
+interface GameMode { id: number; name: string }
+interface AgeRating { id: number; rating: number; category: number }
+interface Company { company: { name: string }; developer: boolean; publisher: boolean }
+interface SimilarGame { id: number; name: string; slug: string; cover?: { url: string } }
 
 interface Game {
   id: number
@@ -15,10 +17,15 @@ interface Game {
   summary?: string
   first_release_date?: number
   rating?: number
+  rating_count?: number
   cover?: { url: string }
   genres?: Genre[]
   platforms?: Platform[]
+  screenshots?: { id: number; url: string }[]
   involved_companies?: Company[]
+  game_modes?: GameMode[]
+  age_ratings?: AgeRating[]
+  similar_games?: SimilarGame[]
 }
 
 interface GameLog {
@@ -27,8 +34,6 @@ interface GameLog {
   review: string | null
   created_at: string
 }
-
-const getCoverUrl = (url: string) => 'https:' + url.replace('t_thumb', 't_cover_big')
 
 async function getGame(slug: string): Promise<Game | null> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
@@ -39,13 +44,19 @@ async function getGame(slug: string): Promise<Game | null> {
   return res.json()
 }
 
+const PEGI: Record<number, string> = { 1: 'PEGI 3', 2: 'PEGI 7', 3: 'PEGI 12', 4: 'PEGI 16', 5: 'PEGI 18' }
+const ESRB: Record<number, string> = { 6: 'RP', 7: 'EC', 8: 'E', 9: 'E10+', 10: 'T', 11: 'M', 12: 'AO' }
+
+function getAgeRatingLabel(ar: AgeRating) {
+  if (ar.category === 1) return PEGI[ar.rating] ?? null
+  if (ar.category === 2) return ESRB[ar.rating] ?? null
+  return null
+}
+
 export default async function GamePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const game = await getGame(slug)
-
-  if (!game) {
-    notFound()
-  }
+  if (!game) notFound()
 
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -65,109 +76,38 @@ export default async function GamePage({ params }: { params: Promise<{ slug: str
     ? new Date(game.first_release_date * 1000).getFullYear()
     : null
   const igdbRating = game.rating ? Math.round(game.rating) : null
-  const studio = game.involved_companies?.[0]?.company?.name
+  const developer = game.involved_companies?.find(c => c.developer)?.company.name
+  const publisher = game.involved_companies?.find(c => c.publisher)?.company.name
+  const ageRatingLabel = game.age_ratings
+    ?.map(getAgeRatingLabel)
+    .find(Boolean) ?? null
+
+  const gameForModal = {
+    id: game.id,
+    name: game.name,
+    slug: game.slug,
+    cover: game.cover,
+    first_release_date: game.first_release_date,
+  }
 
   return (
     <MarqueeBackground>
       <div className="p-8 min-h-screen">
         <div
-          className="max-w-5xl mx-auto rounded-2xl p-8"
-          style={{
-            background: 'color-mix(in srgb, var(--background) 94%, transparent)',
-            border: '1px solid var(--border)',
-            color: 'var(--foreground)',
-          }}
+          className="max-w-5xl mx-auto rounded-2xl overflow-hidden"
+          style={{ background: 'color-mix(in srgb, var(--background) 94%, transparent)', border: '1px solid var(--border)', color: 'var(--foreground)' }}
         >
-          <div className="flex flex-col md:flex-row gap-8">
-            <div className="flex-shrink-0 mx-auto md:mx-0">
-              {game.cover ? (
-                <Image
-                  src={getCoverUrl(game.cover.url)}
-                  alt={game.name}
-                  width={264}
-                  height={352}
-                  className="rounded-xl object-cover"
-                />
-              ) : (
-                <div
-                  className="rounded-xl flex items-center justify-center text-sm"
-                  style={{ width: 264, height: 352, background: 'var(--surface-2)', color: 'var(--text-muted)' }}
-                >
-                  No cover
-                </div>
-              )}
-            </div>
-
-            <div className="flex-1">
-              <h1 className="text-4xl font-bold mb-2">{game.name}</h1>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
-                {year && <span>{year}</span>}
-                {studio && <span>{studio}</span>}
-                {igdbRating && <span>IGDB {igdbRating}/100</span>}
-              </div>
-
-              {game.genres && game.genres.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {game.genres.map((g) => (
-                    <span
-                      key={g.id}
-                      className="px-3 py-1 rounded-full text-xs"
-                      style={{ background: 'var(--surface-2)', color: 'var(--text-muted)' }}
-                    >
-                      {g.name}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {game.summary && (
-                <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--foreground)' }}>
-                  {game.summary}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-10 pt-8" style={{ borderTop: '1px solid var(--border)' }}>
-            <h2 className="text-xl font-semibold mb-4">Your log</h2>
-            {myLog ? (
-              <div className="rounded-xl p-5" style={{ background: 'var(--surface)' }}>
-                <p className="text-2xl mb-2" style={{ color: '#facc15' }}>
-                  {'★'.repeat(myLog.rating)}
-                  <span style={{ color: 'var(--border)' }}>{'★'.repeat(5 - myLog.rating)}</span>
-                </p>
-                {myLog.review ? (
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--foreground)' }}>
-                    {myLog.review}
-                  </p>
-                ) : (
-                  <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>
-                    No written review.
-                  </p>
-                )}
-              </div>
-            ) : (
-              <div className="rounded-xl p-5 text-center" style={{ background: 'var(--surface)' }}>
-                <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
-                  You haven&apos;t logged this game yet.
-                </p>
-                <Link
-                  href="/search"
-                  className="inline-block px-5 py-2 rounded-lg text-sm font-medium transition-opacity hover:opacity-90"
-                  style={{ background: 'var(--accent)', color: '#fff' }}
-                >
-                  Log it
-                </Link>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-10 pt-8" style={{ borderTop: '1px solid var(--border)' }}>
-            <h2 className="text-xl font-semibold mb-4">Community reviews</h2>
-            <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>
-              Coming soon — once more players are logging games, you&apos;ll see average ratings and reviews from the community here.
-            </p>
-          </div>
+          <GamePageClient
+            game={game}
+            myLog={myLog}
+            year={year}
+            igdbRating={igdbRating}
+            developer={developer ?? null}
+            publisher={publisher ?? null}
+            ageRatingLabel={ageRatingLabel}
+            gameForModal={gameForModal}
+            isLoggedIn={!!user}
+          />
         </div>
       </div>
     </MarqueeBackground>

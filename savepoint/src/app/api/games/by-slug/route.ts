@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'text/plain',
       },
-      body: `fields name,slug,summary,storyline,first_release_date,rating,cover.url,genres.name,platforms.name,screenshots.url,involved_companies.company.name; where slug = "${slug}"; limit 1;`,
+      body: `fields name,slug,summary,first_release_date,rating,rating_count,cover.url,genres.name,platforms.name,screenshots.url,involved_companies.company.name,involved_companies.developer,involved_companies.publisher,game_modes.name,age_ratings.rating,age_ratings.category,similar_games.name,similar_games.slug,similar_games.cover.url; where slug = "${slug}"; limit 1;`,
     })
 
     const games = await res.json()
