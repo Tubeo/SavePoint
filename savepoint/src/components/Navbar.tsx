@@ -86,7 +86,7 @@ export default function Navbar() {
               <button
                 onClick={handleSignOut}
                 style={{ color: 'var(--text-muted)' }}
-                className="hover:opacity-80 transition-opacity"
+                className="hover:opacity-80 transition-opacity cursor-pointer"
               >
                 Sign out
               </button>

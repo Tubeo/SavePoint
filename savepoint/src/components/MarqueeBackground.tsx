@@ -44,8 +44,8 @@ export default function MarqueeBackground({ children }: { children: React.ReactN
   const row5 = games.slice(20, 40)
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0f', position: 'relative', overflow: 'hidden' }}>
-      <style>{`
+    <div style={{ minHeight: '100vh', background: 'var(--background)', position: 'relative', overflow: 'hidden' }}>
+          <style>{`
         @keyframes scrollLeft {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
@@ -68,7 +68,7 @@ export default function MarqueeBackground({ children }: { children: React.ReactN
 
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, #0a0a0f 0%, transparent 20%, transparent 80%, #0a0a0f 100%)'
+        background: 'linear-gradient(to bottom, var(--background) 0%, transparent 20%, transparent 80%, var(--background) 100%)'
       }} />
 
       <div style={{ position: 'relative', zIndex: 2 }}>

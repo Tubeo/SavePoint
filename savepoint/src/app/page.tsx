@@ -123,16 +123,10 @@ export default function HomePage() {
               What are you playing?
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              <Link
-                href="/search"
-                style={{ background: '#6366f1', color: '#fff', padding: '12px 28px', borderRadius: '8px', fontSize: '15px', fontWeight: 500, textDecoration: 'none' }}
-              >
+              <Link href="/search" style={{ background: '#6366f1', color: '#fff', padding: '12px 28px', borderRadius: '8px', fontSize: '15px', fontWeight: 500, textDecoration: 'none' }}>
                 Log a game
               </Link>
-              <Link
-                href="/profile"
-                style={{ background: 'rgba(255,255,255,0.08)', color: '#f9fafb', padding: '12px 28px', borderRadius: '8px', fontSize: '15px', fontWeight: 500, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}
-              >
+              <Link href="/profile" style={{ background: 'rgba(255,255,255,0.08)', color: '#f9fafb', padding: '12px 28px', borderRadius: '8px', fontSize: '15px', fontWeight: 500, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>
                 My profile
               </Link>
             </div>
@@ -149,16 +143,10 @@ export default function HomePage() {
               Track the games you've played. Rate them. Remember them.
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              <Link
-                href="/auth/signup"
-                style={{ background: '#6366f1', color: '#fff', padding: '12px 28px', borderRadius: '8px', fontSize: '15px', fontWeight: 500, textDecoration: 'none' }}
-              >
+              <Link href="/auth/signup" style={{ background: '#6366f1', color: '#fff', padding: '12px 28px', borderRadius: '8px', fontSize: '15px', fontWeight: 500, textDecoration: 'none' }}>
                 Get started
               </Link>
-              <Link
-                href="/auth/login"
-                style={{ background: 'rgba(255,255,255,0.08)', color: '#f9fafb', padding: '12px 28px', borderRadius: '8px', fontSize: '15px', fontWeight: 500, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}
-              >
+              <Link href="/auth/login" style={{ background: 'rgba(255,255,255,0.08)', color: '#f9fafb', padding: '12px 28px', borderRadius: '8px', fontSize: '15px', fontWeight: 500, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>
                 Sign in
               </Link>
             </div>
